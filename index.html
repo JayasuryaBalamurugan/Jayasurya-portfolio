@@ -972,7 +972,12 @@
               <h3 class="form-title">Send a Quick Message</h3>
               <p class="form-desc">Fill out this quick form or reach out directly via email.</p>
 
-              <form id="contact-form" class="contact-form" novalidate>
+              <form id="contact-form" class="contact-form" action="https://formsubmit.co/jayasuryabhr@gmail.com" method="POST" novalidate>
+                <!-- Anti-spam & FormSubmit settings -->
+                <input type="text" name="_honey" style="display:none">
+                <input type="hidden" name="_captcha" value="false">
+                <input type="hidden" name="_template" value="table">
+
                 <div class="form-group">
                   <label for="contact-name">Your Name <span class="required">*</span></label>
                   <input type="text" id="contact-name" name="name" required placeholder="e.g. John Doe">
@@ -1001,6 +1006,13 @@
                   <span class="btn-text">Send Message</span>
                   <div class="spinner" aria-hidden="true"></div>
                 </button>
+
+                <div class="form-direct-action">
+                  <span>Prefer your mail app?</span>
+                  <a href="https://mail.google.com/mail/?view=cm&fs=1&to=jayasuryabhr@gmail.com&su=Software%20Engineer%20Opportunity" target="_blank" rel="noopener noreferrer" class="direct-link">
+                    Open in Gmail &rarr;
+                  </a>
+                </div>
               </form>
             </div>
           </div>

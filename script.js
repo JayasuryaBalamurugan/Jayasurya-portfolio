@@ -236,6 +236,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const contactForm = document.getElementById('contact-form');
   const nameInput = document.getElementById('contact-name');
   const emailInput = document.getElementById('contact-email');
+  const subjectInput = document.getElementById('contact-subject');
   const messageInput = document.getElementById('contact-message');
   const submitBtn = document.getElementById('submit-btn');
 
@@ -285,13 +286,72 @@ document.addEventListener('DOMContentLoaded', () => {
       submitBtn.classList.add('loading');
       submitBtn.disabled = true;
 
-      // Simulate sending asynchronously
-      setTimeout(() => {
+      const userSubject = subjectInput && subjectInput.value.trim()
+        ? subjectInput.value.trim()
+        : `New Portfolio Message from ${nameInput.value.trim()}`;
+
+      const payload = {
+        name: nameInput.value.trim(),
+        email: emailInput.value.trim(),
+        subject: userSubject,
+        message: messageInput.value.trim(),
+        _subject: `[Portfolio] ${userSubject}`,
+        _template: 'table',
+        _captcha: 'false'
+      };
+
+      // Check if browsing via local file:// protocol
+      // FormSubmit requires an HTTP/HTTPS web server; on file:// we directly open Gmail compose
+      if (window.location.protocol === 'file:') {
         submitBtn.classList.remove('loading');
         submitBtn.disabled = false;
         contactForm.reset();
-        showToast('Thank you! Your message has been sent successfully.', 'success', 4500);
-      }, 1200);
+
+        const encodedSubject = encodeURIComponent(userSubject);
+        const encodedBody = encodeURIComponent(`Name: ${payload.name}\nEmail: ${payload.email}\n\nMessage:\n${payload.message}`);
+        const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=jayasuryabhr@gmail.com&su=${encodedSubject}&body=${encodedBody}`;
+
+        showToast('Opening Gmail with your message ready to send...', 'info', 5000);
+        window.open(gmailUrl, '_blank');
+        return;
+      }
+
+      // Send to FormSubmit AJAX endpoint for delivery to jayasuryabhr@gmail.com
+      fetch('https://formsubmit.co/ajax/jayasuryabhr@gmail.com', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify(payload)
+      })
+      .then(response => response.json())
+      .then(data => {
+        submitBtn.classList.remove('loading');
+        submitBtn.disabled = false;
+
+        if (data.success === 'true' || data.success === true) {
+          contactForm.reset();
+          showToast('Message sent successfully! Check your email inbox.', 'success', 5000);
+        } else if (data.message && data.message.toLowerCase().includes('activation')) {
+          showToast('Form activation required: Check jayasuryabhr@gmail.com for the activation email!', 'info', 7000);
+        } else {
+          showToast(data.message || 'Message processed.', 'info', 5000);
+        }
+      })
+      .catch(error => {
+        console.error('Submission error:', error);
+        submitBtn.classList.remove('loading');
+        submitBtn.disabled = false;
+
+        // Fallback: Open Gmail compose
+        const encodedSubject = encodeURIComponent(userSubject);
+        const encodedBody = encodeURIComponent(`From: ${payload.name} (${payload.email})\n\nMessage:\n${payload.message}`);
+        const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=jayasuryabhr@gmail.com&su=${encodedSubject}&body=${encodedBody}`;
+
+        showToast('Connecting via Gmail...', 'info', 4000);
+        window.open(gmailUrl, '_blank');
+      });
     });
   }
 

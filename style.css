@@ -1718,6 +1718,28 @@ ul {
   display: inline-block;
 }
 
+.form-direct-action {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin-top: 0.25rem;
+}
+
+.form-direct-action .direct-link {
+  color: var(--accent-secondary);
+  font-weight: 600;
+  text-decoration: none;
+  transition: color var(--transition-fast);
+}
+
+.form-direct-action .direct-link:hover {
+  text-decoration: underline;
+  color: var(--accent-primary);
+}
+
 /* ==========================================================================
    FOOTER
    ========================================================================== */
